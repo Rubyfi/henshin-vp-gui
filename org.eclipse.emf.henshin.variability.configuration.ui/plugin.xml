@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.emf.henshin.variability.ui"
+            name="Variability Points">
+      </category>
+      
+      <view 
+            category="org.eclipse.emf.henshin.variability.ui"
+            class="org.eclipse.emf.henshin.variability.ui.views.VariabilityPointsView"
+            icon="icons/variability.gif"
+            id="org.eclipse.emf.henshin.variability.ui.views.VariabilityPointsView"
+            name="Variability Points View">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               id="org.eclipse.emf.henshin.variability.ui.views.VariabilityPointsView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.ProblemView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+  </extension>
+  <extension point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="org.eclipse.emf.henshin.variability.ui.objectContribution.ModuleEditPart2"
+            objectClass="org.eclipse.emf.henshin.diagram.edit.parts.RuleEditPart">
+         <action
+               class="org.eclipse.emf.henshin.variability.configuration.ui.actions.FindPresenceConditionsAction"
+               enablesFor="1"
+               id="org.eclipse.emf.henshin.variability.ui.popup.FindPresenceConditionsActionID"
+               label="&amp;Find Presence Conditions"
+               >
+         </action>
+     </objectContribution>       
+</extension>
+  <extension
+        point="org.eclipse.ui.menus">
+  </extension>
+</plugin>
