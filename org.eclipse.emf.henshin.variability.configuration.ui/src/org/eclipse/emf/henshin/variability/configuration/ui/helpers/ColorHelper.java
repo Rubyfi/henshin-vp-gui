@@ -7,37 +7,43 @@ import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.swt.graphics.Color;
 
 public class ColorHelper {
-	
-	private static final Color henshinGreen = new Color(null, 0, 200, 0);  
-	private static final Color fadedRed = new Color(null, 255, 180, 180);
-	private static final Color fadedGreen = new Color(null, 180, 255, 180);
-	private static final Color fadedBlue = new Color(null, 255, 180, 180);
 
-	private static final Map<Color, Color> concealColorMap;
+	private static final Color henshinGreen = new Color(null, 0, 200, 0, 255);  
+	private static final Color fadedRed = new Color(null, 255, 180, 180, 255);
+	private static final Color fadedGreen = new Color(null, 180, 255, 180, 255);
+	private static final Color fadedBlue = new Color(null, 255, 180, 180, 255);
+	private static final Color fadedBlack = new Color(null, 180, 180, 180, 255);
+	private static final Color fadedGray = new Color(null, 220, 220, 220, 255);
+
+	private static final Map<String, Color> concealColorMap;
 	static {
-		concealColorMap = new HashMap<Color, Color>();
-		concealColorMap.put(ColorConstants.black, ColorConstants.gray);
-		concealColorMap.put(ColorConstants.gray, ColorConstants.lightGray);
-		concealColorMap.put(ColorConstants.blue, fadedBlue);
-		concealColorMap.put(ColorConstants.red, fadedRed);
-		concealColorMap.put(henshinGreen, fadedGreen);
+		concealColorMap = new HashMap<String, Color>();
+		concealColorMap.put(ColorConstants.black.toString(), fadedBlack);
+		concealColorMap.put(ColorConstants.gray.toString(), fadedGray);
+		concealColorMap.put(ColorConstants.blue.toString(), fadedBlue);
+		concealColorMap.put(ColorConstants.red.toString(), fadedRed);
+		concealColorMap.put(henshinGreen.toString(), fadedGreen);
 	}
 
-	private static final Map<Color, Color> revealColorMap;
+	private static final Map<String, Color> revealColorMap;
 	static {
-		revealColorMap = new HashMap<Color, Color>();
-		revealColorMap.put(ColorConstants.gray, ColorConstants.black);
-		revealColorMap.put(ColorConstants.lightGray, ColorConstants.gray);
-		revealColorMap.put(fadedBlue, ColorConstants.blue);
-		revealColorMap.put(fadedRed, ColorConstants.red);
-		revealColorMap.put(fadedGreen, henshinGreen);
+		revealColorMap = new HashMap<String, Color>();
+		revealColorMap.put(fadedBlack.toString(), ColorConstants.black);
+		revealColorMap.put(fadedGray.toString(), ColorConstants.gray);
+		revealColorMap.put(fadedBlue.toString(), ColorConstants.blue);
+		revealColorMap.put(fadedRed.toString(), ColorConstants.red);
+		revealColorMap.put(fadedGreen.toString(), henshinGreen);
 	}
 	
 	public static final Color getConcealColor(Color color) {
-		return concealColorMap.get(color);
+		Color newColor = concealColorMap.get(color.toString());
+		System.out.println(color + " -> " + newColor);
+		return newColor;
 	}
 	
 	public static final Color getRevealColor(Color color) {
-		return revealColorMap.get(color);
+		Color newColor = revealColorMap.get(color.toString());
+		System.out.println(color + " -> " + newColor);
+		return newColor;
 	}
 }

@@ -6,13 +6,16 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.emf.databinding.EMFProperties;
+import org.eclipse.emf.henshin.diagram.edit.parts.NodeCompartmentEditPart;
 import org.eclipse.emf.henshin.diagram.edit.parts.RuleEditPart;
+import org.eclipse.emf.henshin.diagram.edit.policies.NodeCompartmentItemSemanticEditPolicy;
+import org.eclipse.emf.henshin.diagram.edit.policies.RuleCompartmentItemSemanticEditPolicy;
 import org.eclipse.emf.henshin.model.HenshinPackage;
 import org.eclipse.emf.henshin.model.Rule;
 import org.eclipse.emf.henshin.variability.configuration.ui.actions.LoadFavoriteConfigurationAction;
-import org.eclipse.emf.henshin.variability.configuration.ui.commands.RuleCompartmenItemVariabilityEditPolicy;
 import org.eclipse.emf.henshin.variability.configuration.ui.controls.DropDownMenuAction;
 import org.eclipse.emf.henshin.variability.configuration.ui.dialogs.FavoriteConfigurationNameDialog;
+import org.eclipse.emf.henshin.variability.configuration.ui.helpers.CreationMode;
 import org.eclipse.emf.henshin.variability.configuration.ui.helpers.FigureVisibilityConcealingStrategy;
 import org.eclipse.emf.henshin.variability.configuration.ui.helpers.ImageHelper;
 import org.eclipse.emf.henshin.variability.configuration.ui.helpers.RuleEditPartVisibilityHelper;
@@ -23,17 +26,21 @@ import org.eclipse.emf.henshin.variability.configuration.ui.parts.ILinkedWithEdi
 import org.eclipse.emf.henshin.variability.configuration.ui.parts.ITableViewerSynchronizedPart;
 import org.eclipse.emf.henshin.variability.configuration.ui.parts.LinkWithEditorSelectionListener;
 import org.eclipse.emf.henshin.variability.configuration.ui.parts.SynchronizedTableViewer;
+import org.eclipse.emf.henshin.variability.configuration.ui.policies.NodeCompartmentItemVariabilityEditPolicy;
+import org.eclipse.emf.henshin.variability.configuration.ui.policies.RuleCompartmenItemVariabilityEditPolicy;
 import org.eclipse.emf.henshin.variability.configuration.ui.providers.ConfigurationProvider;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerComparator;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerContentProvider;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerNameEditingSupport;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerStateEditingSupport;
+import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.editparts.AbstractEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.layout.TableColumnLayout;
@@ -74,8 +81,8 @@ public class VariabilityPointsView extends ViewPart
 
 	private SynchronizedTableViewer viewer;
 	private Action showBaseRuleAction, showConfiguredRuleAction, showFullRuleAction, linkWithEditorAction,
-			fadeConcealingAction, visibilityConcealingAction;
-	private DropDownMenuAction loadFavoritesAction, concealingAction;
+			fadeConcealingAction, visibilityConcealingAction, linkToViewingMode, createInBase, createInConfiguration;
+	private DropDownMenuAction loadFavoritesMenu, elementCreationMenu;
 	private LinkWithEditorSelectionListener linkWithEditorSelectionListener = new LinkWithEditorSelectionListener(this);
 	private boolean linkingActive;
 	private Label ruleNameLabel;
@@ -83,7 +90,7 @@ public class VariabilityPointsView extends ViewPart
 	private VPViewerComparator comparator;
 	private ConfigurationProvider configurationProvider = ConfigurationProvider.getInstance();
 	private WritableValue writableValue;
-
+	private CreationMode creationMode = CreationMode.BASE;
 	private Configuration config;
 
 	private RuleEditPart selectedRuleEditPart;
@@ -223,11 +230,80 @@ public class VariabilityPointsView extends ViewPart
 		createMenu();
 		createToolbar();
 	}
+		
+	private void updateEditPolicy(RuleEditPart ruleEditPart) {
+		if(ruleEditPart == null) {
+			return;
+		}
+		
+		AbstractEditPart parent = (AbstractEditPart) ruleEditPart.getChildren().get(1);
+		
+		if(creationMode == CreationMode.CONFIGURATION || 
+				(creationMode == CreationMode.SELECTION && !showBaseRuleAction.isChecked())) {
+			installConfigurationEditPolicy(parent);
+		} else {
+			installBasePolicy(parent);
+		}
+	}
+	
+	protected void installBasePolicy(AbstractEditPart editPart) {
+		editPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new RuleCompartmentItemSemanticEditPolicy());
 
+		for(Object child : editPart.getChildren()) {
+			if(child instanceof NodeEditPart) {
+				NodeEditPart nodeEditPart = (NodeEditPart) child;
+				NodeCompartmentEditPart nodeCompartmentEditPart = (NodeCompartmentEditPart) nodeEditPart.getChildren().get(2);
+				nodeCompartmentEditPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new NodeCompartmentItemSemanticEditPolicy());
+			}
+		}
+	}
+
+	private void installConfigurationEditPolicy(AbstractEditPart editPart) {
+		editPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new RuleCompartmenItemVariabilityEditPolicy(config));
+		
+		for(Object child : editPart.getChildren()) {
+			if(child instanceof NodeEditPart) {
+				NodeEditPart nodeEditPart = (NodeEditPart) child;
+				NodeCompartmentEditPart nodeCompartmentEditPart = (NodeCompartmentEditPart) nodeEditPart.getChildren().get(2);
+				nodeCompartmentEditPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new NodeCompartmentItemVariabilityEditPolicy(config));
+			}
+		}
+	}
+	
 	private void createActions(Composite parent) {
-
-		concealingAction = new DropDownMenuAction("Select concealing strategy", parent);
-		concealingAction.setImageDescriptor(ImageHelper.getImageDescriptor("icons/concealing1.gif"));
+		elementCreationMenu = new DropDownMenuAction("Element creation mode", parent);
+		elementCreationMenu.setImageDescriptor(ImageHelper.getImageDescriptor("icons/creation_mode.gif"));
+		
+		linkToViewingMode = new Action("Link to viewing mode", IAction.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				creationMode = CreationMode.SELECTION;
+				updateEditPolicy(selectedRuleEditPart);
+			}
+		};
+		linkToViewingMode.setImageDescriptor(ImageHelper.getImageDescriptor("icons/add_to_selection.gif"));
+		
+		createInBase = new Action("Create in rulebase", IAction.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				creationMode = CreationMode.BASE;
+				updateEditPolicy(selectedRuleEditPart);
+			}
+		};
+		createInBase.setImageDescriptor(ImageHelper.getImageDescriptor("icons/add_to_base.gif"));
+		
+		createInConfiguration = new Action("Create in configuration", IAction.AS_RADIO_BUTTON) {
+			@Override
+			public void run() {
+				creationMode = CreationMode.CONFIGURATION;
+				updateEditPolicy(selectedRuleEditPart);
+			}
+		};
+		createInConfiguration.setImageDescriptor(ImageHelper.getImageDescriptor("icons/add_to_configuration.gif"));
+		
+		elementCreationMenu.addActionToMenu(linkToViewingMode);
+		elementCreationMenu.addActionToMenu(createInBase);
+		elementCreationMenu.addActionToMenu(createInConfiguration);
 
 		visibilityConcealingAction = new Action("Visibility", IAction.AS_RADIO_BUTTON) {
 			@Override
@@ -246,8 +322,6 @@ public class VariabilityPointsView extends ViewPart
 				runSelectedVisibilityAction();
 			};
 		};
-		concealingAction.addActionToMenu(visibilityConcealingAction);
-		concealingAction.addActionToMenu(fadeConcealingAction);
 
 		showBaseRuleAction = new Action("Show Base Rule", IAction.AS_RADIO_BUTTON) {
 			@Override
@@ -255,6 +329,9 @@ public class VariabilityPointsView extends ViewPart
 				if (isChecked()) {
 					super.run();
 					RuleEditPartVisibilityHelper.showBaseRule(selectedRuleEditPart);
+					if(creationMode == CreationMode.SELECTION) {
+						updateEditPolicy(selectedRuleEditPart);
+					}
 				}
 			}
 		};
@@ -267,9 +344,9 @@ public class VariabilityPointsView extends ViewPart
 					super.run();
 					RuleEditPartVisibilityHelper.showConfiguredRule(selectedRuleEditPart, config,
 							config.getRule().getFeatureModel());
-					AbstractEditPart parent = (AbstractEditPart) selectedRuleEditPart.getChildren().get(1);
-					parent.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
-							new RuleCompartmenItemVariabilityEditPolicy(config));
+					if(creationMode == CreationMode.SELECTION) {
+						updateEditPolicy(selectedRuleEditPart);
+					}
 				}
 			}
 		};
@@ -287,7 +364,7 @@ public class VariabilityPointsView extends ViewPart
 		showFullRuleAction.setImageDescriptor(ImageHelper.getImageDescriptor("icons/rule_full.gif"));
 		showFullRuleAction.setChecked(true);
 
-		loadFavoritesAction = new DropDownMenuAction("Manage favorites", parent) {
+		loadFavoritesMenu = new DropDownMenuAction("Manage favorites", parent) {
 			@Override
 			public void runWithEvent(Event event) {
 				if (config == null) {
@@ -327,8 +404,8 @@ public class VariabilityPointsView extends ViewPart
 				firePropertyChange(CHECKED, !favorite, favorite);
 			}
 		};
-		loadFavoritesAction.setToolTipText("Manage favorites");
-		loadFavoritesAction.setImageDescriptor(ImageHelper.getImageDescriptor("icons/star_grey.png"));
+		loadFavoritesMenu.setToolTipText("Manage favorites");
+		loadFavoritesMenu.setImageDescriptor(ImageHelper.getImageDescriptor("icons/star_grey.png"));
 
 		linkWithEditorAction = new Action("Link with editor", IAction.AS_CHECK_BOX) {
 			@Override
@@ -341,19 +418,24 @@ public class VariabilityPointsView extends ViewPart
 
 	private void createMenu() {
 		IMenuManager mgr = getViewSite().getActionBars().getMenuManager();
+		IMenuManager subMgr = new MenuManager("Concealing strategies", ImageHelper.getImageDescriptor("icons/concealing.gif"), null);
+		
 		mgr.add(linkWithEditorAction);
+		mgr.add(subMgr);
+		subMgr.add(fadeConcealingAction);
+		subMgr.add(visibilityConcealingAction);
 	}
 
 	private void createToolbar() {
 		IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
 
-		mgr.add(concealingAction);
+		mgr.add(elementCreationMenu);
 		mgr.add(new Separator());
 		mgr.add(showBaseRuleAction);
 		mgr.add(showConfiguredRuleAction);
 		mgr.add(showFullRuleAction);
 		mgr.add(new Separator());
-		mgr.add(loadFavoritesAction);
+		mgr.add(loadFavoritesMenu);
 		mgr.add(new Separator());
 		mgr.add(linkWithEditorAction);
 	}
@@ -372,7 +454,7 @@ public class VariabilityPointsView extends ViewPart
 
 		viewer.setInput(config);
 		ruleNameLabel.setText(rule.getName());
-		loadFavoritesAction.setChecked(configurationProvider.isFavorite(config));
+		loadFavoritesMenu.setChecked(configurationProvider.isFavorite(config));
 		writableValue.setValue(rule);
 	}
 
@@ -414,7 +496,7 @@ public class VariabilityPointsView extends ViewPart
 	}
 
 	private void populateFavoritesDropDown(Rule rule) {
-		loadFavoritesAction.clearMenu();
+		loadFavoritesMenu.clearMenu();
 
 		Set<Favorite> favorites = configurationProvider.getFavorites(rule);
 
@@ -422,7 +504,7 @@ public class VariabilityPointsView extends ViewPart
 			for (Favorite favorite : favorites) {
 				LoadFavoriteConfigurationAction loadConfigurationAction = new LoadFavoriteConfigurationAction(favorite,
 						this);
-				loadFavoritesAction.addActionToMenu(loadConfigurationAction);
+				loadFavoritesMenu.addActionToMenu(loadConfigurationAction);
 			}
 		}
 	}
@@ -438,6 +520,8 @@ public class VariabilityPointsView extends ViewPart
 			if (showConfiguredRuleAction.isChecked()) {
 				showConfiguredRuleAction.run();
 			}
+			
+			updateEditPolicy(ruleEditPart);
 
 			refresh();
 		}
@@ -467,8 +551,8 @@ public class VariabilityPointsView extends ViewPart
 
 	@Override
 	public void tableViewerUpdated() {
-		loadFavoritesAction.setChecked(configurationProvider.isFavorite(config));
-		loadFavoritesAction.uncheckAll();
+		loadFavoritesMenu.setChecked(configurationProvider.isFavorite(config));
+		loadFavoritesMenu.uncheckAll();
 		if (showConfiguredRuleAction.isChecked()) {
 			showConfiguredRuleAction.run();
 		}

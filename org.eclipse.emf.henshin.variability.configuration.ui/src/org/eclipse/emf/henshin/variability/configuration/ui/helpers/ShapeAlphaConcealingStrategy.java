@@ -1,8 +1,10 @@
 package org.eclipse.emf.henshin.variability.configuration.ui.helpers;
 
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Shape;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
+import org.eclipse.swt.graphics.Color;
 
 public class ShapeAlphaConcealingStrategy extends AbstractConcealingStrategy {
 
@@ -17,7 +19,10 @@ public class ShapeAlphaConcealingStrategy extends AbstractConcealingStrategy {
 				}
 			}
 		} else {
-			figure.setForegroundColor(ColorHelper.getRevealColor(figure.getForegroundColor()));
+			/**
+			 * @TODO This feature has to be postponed since the EditParts overwrite their colors according to their Action
+			 */
+			//figure.setForegroundColor(ColorConstants.black);
 		}
 	}
 
@@ -32,7 +37,10 @@ public class ShapeAlphaConcealingStrategy extends AbstractConcealingStrategy {
 				}
 			}
 		} else {
-			figure.setForegroundColor(ColorHelper.getConcealColor(figure.getForegroundColor()));
+			/**
+			 * @TODO This feature has to be postponed since the EditParts overwrite their colors according to their Action
+			 */
+			//figure.setForegroundColor(ColorConstants.gray);
 		}
 	}
 }
