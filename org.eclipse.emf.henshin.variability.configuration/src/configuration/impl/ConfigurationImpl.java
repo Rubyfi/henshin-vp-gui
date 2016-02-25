@@ -5,7 +5,7 @@ package configuration.impl;
 import configuration.Configuration;
 import configuration.ConfigurationPackage;
 import configuration.VariabilityPoint;
-import configuration.VariabilityPointState;
+import configuration.VariabilityPointBinding;
 
 import java.util.Collection;
 
@@ -202,10 +202,10 @@ public class ConfigurationImpl extends MinimalEObjectImpl.Container implements C
 		String expression = rule.getFeatureModel();
 		
 		for(VariabilityPoint vp : variabilityPoints) {
-			if(vp.getState() == VariabilityPointState.TRUE) {
+			if(vp.getBinding() == VariabilityPointBinding.TRUE) {
 				expression += " and ";
 				expression += "def(" + vp.getName() + ")";
-			} else if(vp.getState() == VariabilityPointState.FALSE) {
+			} else if(vp.getBinding() == VariabilityPointBinding.FALSE) {
 				expression += " and ";
 				expression += "!(def(" + vp.getName() + "))";
 			}

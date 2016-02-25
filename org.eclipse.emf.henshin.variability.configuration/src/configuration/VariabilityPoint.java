@@ -14,7 +14,7 @@ import org.eclipse.emf.ecore.EObject;
  * </p>
  * <ul>
  *   <li>{@link configuration.VariabilityPoint#getName <em>Name</em>}</li>
- *   <li>{@link configuration.VariabilityPoint#getState <em>State</em>}</li>
+ *   <li>{@link configuration.VariabilityPoint#getBinding <em>Binding</em>}</li>
  * </ul>
  *
  * @see configuration.ConfigurationPackage#getVariabilityPoint()
@@ -49,32 +49,32 @@ public interface VariabilityPoint extends EObject {
 	void setName(String value);
 
 	/**
-	 * Returns the value of the '<em><b>State</b></em>' attribute.
-	 * The literals are from the enumeration {@link configuration.VariabilityPointState}.
+	 * Returns the value of the '<em><b>Binding</b></em>' attribute.
+	 * The literals are from the enumeration {@link configuration.VariabilityPointBinding}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>State</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>State</em>' attribute.
-	 * @see configuration.VariabilityPointState
-	 * @see #setState(VariabilityPointState)
-	 * @see configuration.ConfigurationPackage#getVariabilityPoint_State()
+	 * @return the value of the '<em>Binding</em>' attribute.
+	 * @see configuration.VariabilityPointBinding
+	 * @see #setBinding(VariabilityPointBinding)
+	 * @see configuration.ConfigurationPackage#getVariabilityPoint_Binding()
 	 * @model required="true"
 	 * @generated
 	 */
-	VariabilityPointState getState();
+	VariabilityPointBinding getBinding();
 
 	/**
-	 * Sets the value of the '{@link configuration.VariabilityPoint#getState <em>State</em>}' attribute.
+	 * Sets the value of the '{@link configuration.VariabilityPoint#getBinding <em>Binding</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>State</em>' attribute.
-	 * @see configuration.VariabilityPointState
-	 * @see #getState()
+	 * @param value the new value of the '<em>Binding</em>' attribute.
+	 * @see configuration.VariabilityPointBinding
+	 * @see #getBinding()
 	 * @generated
 	 */
-	void setState(VariabilityPointState value);
+	void setBinding(VariabilityPointBinding value);
 
 } // VariabilityPoint

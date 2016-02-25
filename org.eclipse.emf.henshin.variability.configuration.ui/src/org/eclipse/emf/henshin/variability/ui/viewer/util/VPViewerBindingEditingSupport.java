@@ -1,26 +1,25 @@
 package org.eclipse.emf.henshin.variability.ui.viewer.util;
 
-import org.eclipse.emf.henshin.variability.configuration.ui.parts.ITableViewerSynchronizedPart;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 
 import configuration.VariabilityPoint;
-import configuration.VariabilityPointState;
+import configuration.VariabilityPointBinding;
 
-public class VPViewerStateEditingSupport extends EditingSupport {
+public class VPViewerBindingEditingSupport extends EditingSupport {
 
 	private final TableViewer viewer;
 	
-	public VPViewerStateEditingSupport(TableViewer viewer) {
+	public VPViewerBindingEditingSupport(TableViewer viewer) {
 		super(viewer);
 		this.viewer = viewer;
 	}
 	
 	@Override
 	protected CellEditor getCellEditor(Object element) {
-		return new ComboBoxCellEditor(viewer.getTable(), VariabilityPointState.getNames());
+		return new ComboBoxCellEditor(viewer.getTable(), VariabilityPointBinding.getNames());
 	}
 
 	@Override
@@ -30,12 +29,12 @@ public class VPViewerStateEditingSupport extends EditingSupport {
 
 	@Override
 	protected Object getValue(Object element) {
-		return ((VariabilityPoint)element).getState().getValue();
+		return ((VariabilityPoint)element).getBinding().getValue();
 	}
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		((VariabilityPoint)element).setState(VariabilityPointState.get((int)value));
+		((VariabilityPoint)element).setBinding(VariabilityPointBinding.get((int)value));
 		getViewer().update(element, null);
 	}
 

@@ -29,10 +29,10 @@ import org.eclipse.emf.henshin.variability.configuration.ui.parts.SynchronizedTa
 import org.eclipse.emf.henshin.variability.configuration.ui.policies.NodeCompartmentItemVariabilityEditPolicy;
 import org.eclipse.emf.henshin.variability.configuration.ui.policies.RuleCompartmenItemVariabilityEditPolicy;
 import org.eclipse.emf.henshin.variability.configuration.ui.providers.ConfigurationProvider;
+import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerBindingEditingSupport;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerComparator;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerContentProvider;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerNameEditingSupport;
-import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerStateEditingSupport;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.editparts.AbstractEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
@@ -53,8 +53,10 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -70,14 +72,15 @@ import org.eclipse.ui.part.ViewPart;
 import configuration.Configuration;
 import configuration.Favorite;
 import configuration.VariabilityPoint;
+import swing2swt.layout.FlowLayout;
 
-public class VariabilityPointsView extends ViewPart
+public class VariabilityView extends ViewPart
 		implements ILinkedWithEditorView, IContentView<Configuration>, ITableViewerSynchronizedPart {
 
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = "org.eclipse.emf.henshin.variability.ui.views.VariabilityPointsView";
+	public static final String ID = "org.eclipse.emf.henshin.variability.ui.views.VariabilityView";
 
 	private SynchronizedTableViewer viewer;
 	private Action showBaseRuleAction, showConfiguredRuleAction, showFullRuleAction, linkWithEditorAction,
@@ -85,15 +88,16 @@ public class VariabilityPointsView extends ViewPart
 	private DropDownMenuAction loadFavoritesMenu, elementCreationMenu;
 	private LinkWithEditorSelectionListener linkWithEditorSelectionListener = new LinkWithEditorSelectionListener(this);
 	private boolean linkingActive;
-	private Label ruleNameLabel;
 	private Text variabilityModelText;
 	private VPViewerComparator comparator;
 	private ConfigurationProvider configurationProvider = ConfigurationProvider.getInstance();
 	private WritableValue writableValue;
-	private CreationMode creationMode = CreationMode.BASE;
+	private CreationMode creationMode = CreationMode.SELECTION;
 	private Configuration config;
 
 	private RuleEditPart selectedRuleEditPart;
+
+	private Label ruleNameLabel;
 
 	public RuleEditPart getSelectedRuleEditPart() {
 		return selectedRuleEditPart;
@@ -103,7 +107,7 @@ public class VariabilityPointsView extends ViewPart
 		this.selectedRuleEditPart = selectedRuleEditPart;
 	}
 
-	public VariabilityPointsView() {
+	public VariabilityView() {
 		super();
 	}
 
@@ -116,7 +120,18 @@ public class VariabilityPointsView extends ViewPart
 	}
 
 	private Composite createViewer(Composite parent) {
+		
+		Composite buttonComposite = new Composite(parent, SWT.NONE);
+		buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		buttonComposite.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 5));
+		
+		Button add = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
+		add.setImage(ImageHelper.getImage("/icons/add.gif"));
+		
+		Button delete = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
+		delete.setImage(ImageHelper.getImage("/icons/delete.gif"));
 		Composite tableComposite = new Composite(parent, SWT.NONE);
+		tableComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 		TableColumnLayout tableColumnLayout = new TableColumnLayout();
 		tableComposite.setLayout(tableColumnLayout);
 
@@ -148,7 +163,7 @@ public class VariabilityPointsView extends ViewPart
 
 	private void createColumns(final Composite parent, final TableColumnLayout tableColumnLayout,
 			final TableViewer viewer) {
-		String[] titles = { "Variability Point", "State" };
+		String[] titles = { "Variability Point", "Binding" };
 
 		TableViewerColumn col = createTableViewerColumn(titles[0], 0);
 		col.setLabelProvider(new ColumnLabelProvider() {
@@ -156,6 +171,10 @@ public class VariabilityPointsView extends ViewPart
 			public String getText(Object element) {
 				VariabilityPoint vp = (VariabilityPoint) element;
 				return vp.getName();
+			}
+			@Override
+			public Image getImage(Object element) {
+				return ImageHelper.getImage("/icons/table_default.png");
 			}
 		});
 		col.setEditingSupport(new VPViewerNameEditingSupport(viewer));
@@ -166,10 +185,14 @@ public class VariabilityPointsView extends ViewPart
 			@Override
 			public String getText(Object element) {
 				VariabilityPoint vp = (VariabilityPoint) element;
-				return vp.getState().getName();
+				return vp.getBinding().getName();
+			}
+			@Override
+			public Image getImage(Object element) {
+				return ImageHelper.getImage("/icons/" +  ((VariabilityPoint) element).getBinding().getName().toLowerCase() +  ".png");
 			}
 		});
-		col.setEditingSupport(new VPViewerStateEditingSupport(viewer));
+		col.setEditingSupport(new VPViewerBindingEditingSupport(viewer));
 		tableColumnLayout.setColumnData(col.getColumn(), new ColumnWeightData(40, false));
 	}
 
@@ -188,41 +211,42 @@ public class VariabilityPointsView extends ViewPart
 
 	@Override
 	public void createPartControl(Composite parent) {
-		GridLayout layout = new GridLayout(2, false);
-		parent.setLayout(layout);
-
-		GridData gridData = new GridData();
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.horizontalSpan = 2;
-
-		ruleNameLabel = new Label(parent, SWT.FILL);
-		ruleNameLabel.setLayoutData(gridData);
-
-		Label variabilityModelLabel = new Label(parent, SWT.NONE);
+		GridLayout gl_parent = new GridLayout(1, false);
+		gl_parent.verticalSpacing = 0;
+		parent.setLayout(gl_parent);
+		
+		Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
+		composite.setLayout(new GridLayout(2, false));
+		
+		ruleNameLabel = new Label(composite, SWT.NONE);
+		ruleNameLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+		ruleNameLabel.setText("No rule selected");
+		
+		Label variabilityModelLabel = new Label(composite, SWT.NONE);
 		variabilityModelLabel.setImage(ImageHelper.getImage("/icons/variability.gif"));
-		variabilityModelText = new Text(parent, SWT.BORDER | SWT.SEARCH);
-		variabilityModelText.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.HORIZONTAL_ALIGN_FILL));
-		DataBindingContext bindingContext = new DataBindingContext();
+		variabilityModelText = new Text(composite, SWT.BORDER | SWT.SEARCH);
+		variabilityModelText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		IObservableValue target = WidgetProperties.text(SWT.Modify).observe(variabilityModelText);
+		DataBindingContext bindingContext = new DataBindingContext();
 		writableValue = new WritableValue();
 		IObservableValue model = EMFProperties.value(HenshinPackage.Literals.RULE__FEATURE_MODEL)
 				.observeDetail(writableValue);
 		bindingContext.bindValue(target, model);
 
 		Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
-		separator.setLayoutData(gridData);
+		separator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
+		
 		GridData tableCompositeGridData = new GridData();
 		tableCompositeGridData.grabExcessHorizontalSpace = true;
 		tableCompositeGridData.grabExcessVerticalSpace = true;
 		tableCompositeGridData.horizontalAlignment = GridData.FILL;
 		tableCompositeGridData.verticalAlignment = GridData.FILL;
 		tableCompositeGridData.horizontalSpan = 2;
-
 		Composite tableComposite = createViewer(parent);
 		tableComposite.setLayoutData(tableCompositeGridData);
-
+		
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(),
 				"org.eclipse.emf.henshin.variability.ui.viewer");
@@ -381,7 +405,7 @@ public class VariabilityPointsView extends ViewPart
 							Favorite favorite = configurationProvider.addConfigurationToFavorites(config.getRule(),
 									name, config);
 							LoadFavoriteConfigurationAction loadConfigurationAction = new LoadFavoriteConfigurationAction(
-									favorite, VariabilityPointsView.this);
+									favorite, VariabilityView.this);
 							this.addActionToMenu(loadConfigurationAction);
 							this.uncheckAll();
 							loadConfigurationAction.setChecked(true);
@@ -453,7 +477,7 @@ public class VariabilityPointsView extends ViewPart
 		Rule rule = config.getRule();
 
 		viewer.setInput(config);
-		ruleNameLabel.setText(rule.getName());
+		ruleNameLabel.setText("Rule " + rule.getName());
 		loadFavoritesMenu.setChecked(configurationProvider.isFavorite(config));
 		writableValue.setValue(rule);
 	}

@@ -40,7 +40,7 @@ public class VPViewerComparator extends ViewerComparator {
 			result = vp1.getName().compareTo(vp2.getName());
 			break;
 		case 1:
-			result = vp1.getState().compareTo(vp2.getState());
+			result = vp1.getBinding().compareTo(vp2.getBinding());
 			break;
 		default:
 			break;

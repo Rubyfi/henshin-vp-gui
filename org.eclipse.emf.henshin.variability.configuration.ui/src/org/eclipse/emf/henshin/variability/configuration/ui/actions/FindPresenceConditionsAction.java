@@ -4,7 +4,7 @@ import org.eclipse.emf.henshin.diagram.edit.parts.RuleEditPart;
 import org.eclipse.emf.henshin.model.Rule;
 import org.eclipse.emf.henshin.variability.configuration.ui.helpers.VariabilityModelHelper;
 import org.eclipse.emf.henshin.variability.configuration.ui.providers.ConfigurationProvider;
-import org.eclipse.emf.henshin.variability.ui.views.VariabilityPointsView;
+import org.eclipse.emf.henshin.variability.ui.views.VariabilityView;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -22,7 +22,7 @@ public class FindPresenceConditionsAction implements IActionDelegate {
 	@Override
 	public void run(IAction action) {
 		if(selectedRuleEditPart != null) {
-			VariabilityPointsView vpView = openAndGetVariabilityPointsView();
+			VariabilityView vpView = openAndGetVariabilityPointsView();
 			vpView.showBusy(true);
 			Rule rule = VariabilityModelHelper.getRuleForEditPart(selectedRuleEditPart);
 			ConfigurationProvider configProvider = ConfigurationProvider.getInstance();
@@ -44,13 +44,13 @@ public class FindPresenceConditionsAction implements IActionDelegate {
 		}
 	}
 
-	private VariabilityPointsView openAndGetVariabilityPointsView() {
+	private VariabilityView openAndGetVariabilityPointsView() {
 		try {
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().showView(VariabilityPointsView.ID);
+					.getActivePage().showView(VariabilityView.ID);
 			return 
-					(VariabilityPointsView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-			.getActivePage().findView(VariabilityPointsView.ID);
+					(VariabilityView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+			.getActivePage().findView(VariabilityView.ID);
 		} catch (PartInitException e) {
 			e.printStackTrace();
 			return null;

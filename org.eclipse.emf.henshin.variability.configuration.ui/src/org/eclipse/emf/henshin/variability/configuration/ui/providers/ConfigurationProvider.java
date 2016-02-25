@@ -78,17 +78,18 @@ public class ConfigurationProvider {
 						VariabilityPoint favVP = favorite.getVariabilityPoints().get(i);
 						VariabilityPoint conVP = configuration.getVariabilityPoints().get(i);
 
-						if (conVP.getName().equals(favVP.getName()) && conVP.getState() == favVP.getState()) {
+						if (conVP.getName().equals(favVP.getName()) && conVP.getBinding() == favVP.getBinding()) {
 							matches++;
 						}
 					}
 					if (matches == configuration.getVariabilityPoints().size()) {
-						return favorite;
+						result = favorite;
+						break;
 					}
 				}
 			}
 		}
-		return null;
+		return result;
 	}
 	
 	public void removeConfigurationFromFavorites(Configuration configuration) {
@@ -121,7 +122,13 @@ public class ConfigurationProvider {
 			String featureModel = rule.getFeatureModel();
 			EList<VariabilityPoint> variabilityPoints = result.getVariabilityPoints();
 
-			if (featureModel != null && !featureModel.isEmpty()) {
+			if(rule.getVariabilityPoints() != null) {
+				for(String variabilityPointName : rule.getVariabilityPoints()) {
+					VariabilityPoint vp = fac.createVariabilityPoint();
+					vp.setName(variabilityPointName);
+					variabilityPoints.add(vp);
+				}
+			} else if (featureModel != null && !featureModel.isEmpty()) {
 				Matcher match = Pattern.compile(REGEX).matcher(featureModel);
 				while (match.find()) {
 					for (int i = 1; i <= match.groupCount(); i++) {

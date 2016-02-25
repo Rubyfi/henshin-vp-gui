@@ -29,5 +29,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.emf.databinding
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/swing2swt.jar
 Export-Package: org.eclipse.emf.henshin.variability.configuration.ui.commands

@@ -16,8 +16,9 @@ import de.fosd.typechef.featureexpr.FeatureExpr;
 
 public class RuleEditPartVisibilityHelper {
 	
-	private static boolean REVEAL = false;
+	@SuppressWarnings("unused")
 	private static boolean CONCEAL = true;
+	private static boolean REVEAL = false;
 
 	private static AbstractConcealingStrategy fadingStrategy = new FigureVisibilityConcealingStrategy();
 

@@ -13,11 +13,11 @@ import org.eclipse.emf.common.util.Enumerator;
  * A representation of the literals of the enumeration '<em><b>Variability Point State</b></em>',
  * and utility methods for working with them.
  * <!-- end-user-doc -->
- * @see configuration.ConfigurationPackage#getVariabilityPointState()
+ * @see configuration.ConfigurationPackage#getVariabilityPointBinding()
  * @model
  * @generated
  */
-public enum VariabilityPointState implements Enumerator {
+public enum VariabilityPointBinding implements Enumerator {
 	/**
 	 * The '<em><b>Unbound</b></em>' literal object.
 	 * <!-- begin-user-doc -->
@@ -92,37 +92,37 @@ public enum VariabilityPointState implements Enumerator {
 	public static final int FALSE_VALUE = 2;
 
 	/**
-	 * An array of all the '<em><b>Variability Point State</b></em>' enumerators.
+	 * An array of all the '<em><b>Variability Point Binding</b></em>' enumerators.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private static final VariabilityPointState[] VALUES_ARRAY =
-		new VariabilityPointState[] {
+	private static final VariabilityPointBinding[] VALUES_ARRAY =
+		new VariabilityPointBinding[] {
 			UNBOUND,
 			TRUE,
 			FALSE,
 		};
 
 	/**
-	 * A public read-only list of all the '<em><b>Variability Point State</b></em>' enumerators.
+	 * A public read-only list of all the '<em><b>Variability Point Binding</b></em>' enumerators.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<VariabilityPointState> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List<VariabilityPointBinding> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
-	 * Returns the '<em><b>Variability Point State</b></em>' literal with the specified literal value.
+	 * Returns the '<em><b>Variability Point Binding</b></em>' literal with the specified literal value.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param literal the literal.
 	 * @return the matching enumerator or <code>null</code>.
 	 * @generated
 	 */
-	public static VariabilityPointState get(String literal) {
+	public static VariabilityPointBinding get(String literal) {
 		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
-			VariabilityPointState result = VALUES_ARRAY[i];
+			VariabilityPointBinding result = VALUES_ARRAY[i];
 			if (result.toString().equals(literal)) {
 				return result;
 			}
@@ -131,16 +131,16 @@ public enum VariabilityPointState implements Enumerator {
 	}
 
 	/**
-	 * Returns the '<em><b>Variability Point State</b></em>' literal with the specified name.
+	 * Returns the '<em><b>Variability Point Binding</b></em>' literal with the specified name.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param name the name.
 	 * @return the matching enumerator or <code>null</code>.
 	 * @generated
 	 */
-	public static VariabilityPointState getByName(String name) {
+	public static VariabilityPointBinding getByName(String name) {
 		for (int i = 0; i < VALUES_ARRAY.length; ++i) {
-			VariabilityPointState result = VALUES_ARRAY[i];
+			VariabilityPointBinding result = VALUES_ARRAY[i];
 			if (result.getName().equals(name)) {
 				return result;
 			}
@@ -149,14 +149,14 @@ public enum VariabilityPointState implements Enumerator {
 	}
 
 	/**
-	 * Returns the '<em><b>Variability Point State</b></em>' literal with the specified integer value.
+	 * Returns the '<em><b>Variability Point Binding</b></em>' literal with the specified integer value.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the integer value.
 	 * @return the matching enumerator or <code>null</code>.
 	 * @generated
 	 */
-	public static VariabilityPointState get(int value) {
+	public static VariabilityPointBinding get(int value) {
 		switch (value) {
 			case UNBOUND_VALUE: return UNBOUND;
 			case TRUE_VALUE: return TRUE;
@@ -192,7 +192,7 @@ public enum VariabilityPointState implements Enumerator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private VariabilityPointState(int value, String name, String literal) {
+	private VariabilityPointBinding(int value, String name, String literal) {
 		this.value = value;
 		this.name = name;
 		this.literal = literal;
@@ -237,11 +237,11 @@ public enum VariabilityPointState implements Enumerator {
 	}
 	
 	public static String[] getNames() {
-		VariabilityPointState[] states = values();
+		VariabilityPointBinding[] states = values();
 		String[] names = new String[states.length];
 		
 		for(int i = states.length-1; i >= 0; i--) {
-			names[i] = states[i].name();
+			names[i] = states[i].getName();
 		}
 		return names;
 	}

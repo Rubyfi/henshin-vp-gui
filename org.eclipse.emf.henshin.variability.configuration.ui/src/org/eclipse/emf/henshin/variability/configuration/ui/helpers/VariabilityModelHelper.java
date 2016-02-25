@@ -9,7 +9,7 @@ import org.eclipse.gmf.runtime.notation.impl.ShapeImpl;
 
 import configuration.Configuration;
 import configuration.VariabilityPoint;
-import configuration.VariabilityPointState;
+import configuration.VariabilityPointBinding;
 import de.fosd.typechef.featureexpr.FeatureExpr;
 
 public class VariabilityModelHelper {
@@ -21,9 +21,9 @@ public class VariabilityModelHelper {
 	public static FeatureExpr getFeatureExpression(Configuration configuration) {
 		FeatureExpr expr = FeatureExpression.getExpr(configuration.getRule().getFeatureModel());
 		for(VariabilityPoint vp : configuration.getVariabilityPoints()) {
-			if(vp.getState() == VariabilityPointState.TRUE) {
+			if(vp.getBinding() == VariabilityPointBinding.TRUE) {
 				expr = FeatureExpression.and(expr, FeatureExpression.getExpr("def(" + vp.getName() + ")"));
-			} else if (vp.getState() == VariabilityPointState.FALSE) {
+			} else if (vp.getBinding() == VariabilityPointBinding.FALSE) {
 				expr = FeatureExpression.andNot(expr, FeatureExpression.getExpr("def(" + vp.getName() + ")"));
 			}
 		}
@@ -36,10 +36,10 @@ public class VariabilityModelHelper {
 		String delimiter = "";
 		
 		for(VariabilityPoint vp : configuration.getVariabilityPoints()) {
-			if(vp.getState() != VariabilityPointState.UNBOUND) {
+			if(vp.getBinding() != VariabilityPointBinding.UNBOUND) {
 				result.append(delimiter);
 
-				if(vp.getState() == VariabilityPointState.FALSE) {
+				if(vp.getBinding() == VariabilityPointBinding.FALSE) {
 					result.append("!");
 				}
 				result.append("def(" + vp.getName() + ")");
@@ -51,17 +51,17 @@ public class VariabilityModelHelper {
 	}
 	
 	
-	public static String[] getNonContradictingStateOptions(Configuration configuration, VariabilityPoint vp) {
+	public static String[] getNonContradictingBindingOptions(Configuration configuration, VariabilityPoint vp) {
 		ArrayList<String> options = new ArrayList<String>();
 		FeatureExpr expr = getFeatureExpression(configuration);
 		
-		options.add(VariabilityPointState.UNBOUND.getName());
+		options.add(VariabilityPointBinding.UNBOUND.getName());
 		if(!FeatureExpression.contradicts(expr, FeatureExpression.getExpr("def(" + vp + ")"))) {
-			options.add(VariabilityPointState.TRUE.getName());
+			options.add(VariabilityPointBinding.TRUE.getName());
 		}
 		
 		if(!FeatureExpression.contradicts(expr, FeatureExpression.getExpr("!(def(" + vp + "))"))) {
-			options.add(VariabilityPointState.FALSE.getName());
+			options.add(VariabilityPointBinding.FALSE.getName());
 		}
 		
 		return (String[]) options.toArray();

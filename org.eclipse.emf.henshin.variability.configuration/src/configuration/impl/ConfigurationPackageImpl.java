@@ -7,7 +7,7 @@ import configuration.ConfigurationFactory;
 import configuration.ConfigurationPackage;
 import configuration.Favorite;
 import configuration.VariabilityPoint;
-import configuration.VariabilityPointState;
+import configuration.VariabilityPointBinding;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EEnum;
@@ -50,7 +50,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EEnum variabilityPointStateEEnum = null;
+	private EEnum variabilityPointBindingEEnum = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -139,7 +139,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getVariabilityPoint_State() {
+	public EAttribute getVariabilityPoint_Binding() {
 		return (EAttribute)variabilityPointEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -184,8 +184,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getConfiguration_Rule() {
-		return (EReference)configurationEClass.getEStructuralFeatures().get(0);
+	public EEnum getVariabilityPointBinding() {
+		return variabilityPointBindingEEnum;
 	}
 
 	/**
@@ -193,8 +193,8 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EEnum getVariabilityPointState() {
-		return variabilityPointStateEEnum;
+	public EReference getConfiguration_Rule() {
+		return (EReference)configurationEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		// Create classes and their features
 		variabilityPointEClass = createEClass(VARIABILITY_POINT);
 		createEAttribute(variabilityPointEClass, VARIABILITY_POINT__NAME);
-		createEAttribute(variabilityPointEClass, VARIABILITY_POINT__STATE);
+		createEAttribute(variabilityPointEClass, VARIABILITY_POINT__BINDING);
 
 		configurationEClass = createEClass(CONFIGURATION);
 		createEReference(configurationEClass, CONFIGURATION__RULE);
@@ -237,7 +237,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		createEAttribute(favoriteEClass, FAVORITE__NAME);
 
 		// Create enums
-		variabilityPointStateEEnum = createEEnum(VARIABILITY_POINT_STATE);
+		variabilityPointBindingEEnum = createEEnum(VARIABILITY_POINT_BINDING);
 	}
 
 	/**
@@ -276,7 +276,7 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		// Initialize classes, features, and operations; add parameters
 		initEClass(variabilityPointEClass, VariabilityPoint.class, "VariabilityPoint", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getVariabilityPoint_Name(), ecorePackage.getEString(), "name", null, 0, 1, VariabilityPoint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getVariabilityPoint_State(), this.getVariabilityPointState(), "state", null, 1, 1, VariabilityPoint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getVariabilityPoint_Binding(), this.getVariabilityPointBinding(), "binding", null, 1, 1, VariabilityPoint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(configurationEClass, Configuration.class, "Configuration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getConfiguration_Rule(), theHenshinPackage.getRule(), null, "rule", null, 1, 1, Configuration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -286,10 +286,10 @@ public class ConfigurationPackageImpl extends EPackageImpl implements Configurat
 		initEAttribute(getFavorite_Name(), ecorePackage.getEString(), "name", null, 0, 1, Favorite.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
-		initEEnum(variabilityPointStateEEnum, VariabilityPointState.class, "VariabilityPointState");
-		addEEnumLiteral(variabilityPointStateEEnum, VariabilityPointState.UNBOUND);
-		addEEnumLiteral(variabilityPointStateEEnum, VariabilityPointState.TRUE);
-		addEEnumLiteral(variabilityPointStateEEnum, VariabilityPointState.FALSE);
+		initEEnum(variabilityPointBindingEEnum, VariabilityPointBinding.class, "VariabilityPointBinding");
+		addEEnumLiteral(variabilityPointBindingEEnum, VariabilityPointBinding.UNBOUND);
+		addEEnumLiteral(variabilityPointBindingEEnum, VariabilityPointBinding.TRUE);
+		addEEnumLiteral(variabilityPointBindingEEnum, VariabilityPointBinding.FALSE);
 
 		// Create resource
 		createResource(eNS_URI);

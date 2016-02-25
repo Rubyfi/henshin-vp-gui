@@ -77,13 +77,13 @@ public interface ConfigurationPackage extends EPackage {
 	int VARIABILITY_POINT__NAME = 0;
 
 	/**
-	 * The feature id for the '<em><b>State</b></em>' attribute.
+	 * The feature id for the '<em><b>Binding</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int VARIABILITY_POINT__STATE = 1;
+	int VARIABILITY_POINT__BINDING = 1;
 
 	/**
 	 * The number of structural features of the '<em>Variability Point</em>' class.
@@ -205,15 +205,14 @@ public interface ConfigurationPackage extends EPackage {
 	int FAVORITE_OPERATION_COUNT = CONFIGURATION_OPERATION_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link configuration.VariabilityPointState <em>Variability Point State</em>}' enum.
+	 * The meta object id for the '{@link configuration.VariabilityPointBinding <em>Variability Point Binding</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see configuration.VariabilityPointState
-	 * @see configuration.impl.ConfigurationPackageImpl#getVariabilityPointState()
+	 * @see configuration.VariabilityPointBinding
+	 * @see configuration.impl.ConfigurationPackageImpl#getVariabilityPointBinding()
 	 * @generated
 	 */
-	int VARIABILITY_POINT_STATE = 3;
-
+	int VARIABILITY_POINT_BINDING = 3;
 
 	/**
 	 * Returns the meta object for class '{@link configuration.VariabilityPoint <em>Variability Point</em>}'.
@@ -237,15 +236,15 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getVariabilityPoint_Name();
 
 	/**
-	 * Returns the meta object for the attribute '{@link configuration.VariabilityPoint#getState <em>State</em>}'.
+	 * Returns the meta object for the attribute '{@link configuration.VariabilityPoint#getBinding <em>Binding</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>State</em>'.
-	 * @see configuration.VariabilityPoint#getState()
+	 * @return the meta object for the attribute '<em>Binding</em>'.
+	 * @see configuration.VariabilityPoint#getBinding()
 	 * @see #getVariabilityPoint()
 	 * @generated
 	 */
-	EAttribute getVariabilityPoint_State();
+	EAttribute getVariabilityPoint_Binding();
 
 	/**
 	 * Returns the meta object for class '{@link configuration.Configuration <em>Configuration</em>}'.
@@ -290,6 +289,16 @@ public interface ConfigurationPackage extends EPackage {
 	EAttribute getFavorite_Name();
 
 	/**
+	 * Returns the meta object for enum '{@link configuration.VariabilityPointBinding <em>Variability Point Binding</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for enum '<em>Variability Point Binding</em>'.
+	 * @see configuration.VariabilityPointBinding
+	 * @generated
+	 */
+	EEnum getVariabilityPointBinding();
+
+	/**
 	 * Returns the meta object for the reference '{@link configuration.Configuration#getRule <em>Rule</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -299,16 +308,6 @@ public interface ConfigurationPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getConfiguration_Rule();
-
-	/**
-	 * Returns the meta object for enum '{@link configuration.VariabilityPointState <em>Variability Point State</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for enum '<em>Variability Point State</em>'.
-	 * @see configuration.VariabilityPointState
-	 * @generated
-	 */
-	EEnum getVariabilityPointState();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -352,12 +351,12 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute VARIABILITY_POINT__NAME = eINSTANCE.getVariabilityPoint_Name();
 
 		/**
-		 * The meta object literal for the '<em><b>State</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Binding</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute VARIABILITY_POINT__STATE = eINSTANCE.getVariabilityPoint_State();
+		EAttribute VARIABILITY_POINT__BINDING = eINSTANCE.getVariabilityPoint_Binding();
 
 		/**
 		 * The meta object literal for the '{@link configuration.impl.ConfigurationImpl <em>Configuration</em>}' class.
@@ -396,22 +395,22 @@ public interface ConfigurationPackage extends EPackage {
 		EAttribute FAVORITE__NAME = eINSTANCE.getFavorite_Name();
 
 		/**
+		 * The meta object literal for the '{@link configuration.VariabilityPointBinding <em>Variability Point Binding</em>}' enum.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see configuration.VariabilityPointBinding
+		 * @see configuration.impl.ConfigurationPackageImpl#getVariabilityPointBinding()
+		 * @generated
+		 */
+		EEnum VARIABILITY_POINT_BINDING = eINSTANCE.getVariabilityPointBinding();
+
+		/**
 		 * The meta object literal for the '<em><b>Rule</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
 		EReference CONFIGURATION__RULE = eINSTANCE.getConfiguration_Rule();
-
-		/**
-		 * The meta object literal for the '{@link configuration.VariabilityPointState <em>Variability Point State</em>}' enum.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see configuration.VariabilityPointState
-		 * @see configuration.impl.ConfigurationPackageImpl#getVariabilityPointState()
-		 * @generated
-		 */
-		EEnum VARIABILITY_POINT_STATE = eINSTANCE.getVariabilityPointState();
 
 	}
 

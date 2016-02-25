@@ -74,8 +74,8 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
-			case ConfigurationPackage.VARIABILITY_POINT_STATE:
-				return createVariabilityPointStateFromString(eDataType, initialValue);
+			case ConfigurationPackage.VARIABILITY_POINT_BINDING:
+				return createVariabilityPointBindingFromString(eDataType, initialValue);
 			default:
 				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
@@ -89,8 +89,8 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
-			case ConfigurationPackage.VARIABILITY_POINT_STATE:
-				return convertVariabilityPointStateToString(eDataType, instanceValue);
+			case ConfigurationPackage.VARIABILITY_POINT_BINDING:
+				return convertVariabilityPointBindingToString(eDataType, instanceValue);
 			default:
 				throw new IllegalArgumentException("The datatype '" + eDataType.getName() + "' is not a valid classifier");
 		}
@@ -128,7 +128,7 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 		for (VariabilityPoint vp : configuration.getVariabilityPoints()) {
 			VariabilityPoint variabilityPoint = createVariabilityPoint();
 			variabilityPoint.setName(new String(vp.getName()));
-			variabilityPoint.setState(vp.getState());
+			variabilityPoint.setBinding(vp.getBinding());
 			variabilityPoints.add(variabilityPoint);
 		}
 		
@@ -146,6 +146,26 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 	}
 	
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public VariabilityPointBinding createVariabilityPointBindingFromString(EDataType eDataType, String initialValue) {
+		VariabilityPointBinding result = VariabilityPointBinding.get(initialValue);
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertVariabilityPointBindingToString(EDataType eDataType, Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
+	}
+
+	/**
 	 * @generated NOT
 	 */
 	public Favorite createFavorite(Configuration configuration) {
@@ -157,31 +177,11 @@ public class ConfigurationFactoryImpl extends EFactoryImpl implements Configurat
 		for (VariabilityPoint vp : configuration.getVariabilityPoints()) {
 			VariabilityPoint variabilityPoint = createVariabilityPoint();
 			variabilityPoint.setName(new String(vp.getName()));
-			variabilityPoint.setState(vp.getState());
+			variabilityPoint.setBinding(vp.getBinding());
 			variabilityPoints.add(variabilityPoint);
 		}
 		
 		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public VariabilityPointState createVariabilityPointStateFromString(EDataType eDataType, String initialValue) {
-		VariabilityPointState result = VariabilityPointState.get(initialValue);
-		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
-		return result;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String convertVariabilityPointStateToString(EDataType eDataType, Object instanceValue) {
-		return instanceValue == null ? null : instanceValue.toString();
 	}
 
 	/**
