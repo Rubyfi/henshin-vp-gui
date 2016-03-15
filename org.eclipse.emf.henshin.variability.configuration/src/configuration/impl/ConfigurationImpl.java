@@ -3,6 +3,7 @@
 package configuration.impl;
 
 import configuration.Configuration;
+import configuration.ConfigurationFactory;
 import configuration.ConfigurationPackage;
 import configuration.VariabilityPoint;
 import configuration.VariabilityPointBinding;
@@ -21,6 +22,11 @@ import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
 
 import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.henshin.model.Rule;
+import org.eclipse.emf.henshin.model.impl.RuleImpl;
+import org.eclipse.emf.transaction.ResourceSetChangeEvent;
+import org.eclipse.emf.transaction.ResourceSetListenerImpl;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.transaction.util.TransactionUtil;
 
 /**
  * <!-- begin-user-doc -->
@@ -114,6 +120,33 @@ public class ConfigurationImpl extends MinimalEObjectImpl.Container implements C
 		return rule;
 	}
 
+	protected class VariabilityPointListener extends ResourceSetListenerImpl {
+		
+		private ConfigurationFactory fac = ConfigurationFactory.eINSTANCE;
+		
+		@Override
+		public void resourceSetChanged(ResourceSetChangeEvent event) {
+			 super.resourceSetChanged(event);
+			 for(Notification notification : event.getNotifications()) {
+				 if(notification instanceof ENotificationImpl && notification.getNotifier().getClass() == RuleImpl.class && notification.getFeatureID(RuleImpl.class) == 15) {
+					 if(notification.getEventType() == Notification.ADD) {
+						 VariabilityPoint vp = fac.createVariabilityPoint();
+						 vp.setName(notification.getNewStringValue());
+						 getVariabilityPoints().add(vp);
+					 } else if(notification.getEventType() == Notification.REMOVE) { 
+						 for(int i = variabilityPoints.size() - 1; i >= 0; i--) {
+							  if(variabilityPoints.get(i).getName().equals(notification.getOldStringValue())) {
+								  variabilityPoints.remove(i);
+								  break;
+							  }
+						 }
+					 }
+				 }
+			 }
+		}
+	}
+
+	
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -122,6 +155,8 @@ public class ConfigurationImpl extends MinimalEObjectImpl.Container implements C
 	public void setRule(Rule newRule) {
 		Rule oldRule = rule;
 		rule = newRule;
+		TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(rule);
+		domain.addResourceSetListener(new VariabilityPointListener());
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, ConfigurationPackage.CONFIGURATION__RULE, oldRule, rule));
 	}
@@ -214,5 +249,4 @@ public class ConfigurationImpl extends MinimalEObjectImpl.Container implements C
 		
 		return expression;
 	}
-
 } //ConfigurationImpl
