@@ -5,7 +5,12 @@ import java.util.Set;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.databinding.EMFProperties;
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.henshin.diagram.edit.parts.NodeCompartmentEditPart;
 import org.eclipse.emf.henshin.diagram.edit.parts.RuleEditPart;
 import org.eclipse.emf.henshin.diagram.edit.policies.NodeCompartmentItemSemanticEditPolicy;
@@ -14,7 +19,7 @@ import org.eclipse.emf.henshin.model.HenshinPackage;
 import org.eclipse.emf.henshin.model.Rule;
 import org.eclipse.emf.henshin.variability.configuration.ui.actions.LoadFavoriteConfigurationAction;
 import org.eclipse.emf.henshin.variability.configuration.ui.controls.DropDownMenuAction;
-import org.eclipse.emf.henshin.variability.configuration.ui.dialogs.FavoriteConfigurationNameDialog;
+import org.eclipse.emf.henshin.variability.configuration.ui.dialogs.NameDialog;
 import org.eclipse.emf.henshin.variability.configuration.ui.helpers.CreationMode;
 import org.eclipse.emf.henshin.variability.configuration.ui.helpers.FigureVisibilityConcealingStrategy;
 import org.eclipse.emf.henshin.variability.configuration.ui.helpers.ImageHelper;
@@ -26,13 +31,17 @@ import org.eclipse.emf.henshin.variability.configuration.ui.parts.ILinkedWithEdi
 import org.eclipse.emf.henshin.variability.configuration.ui.parts.ITableViewerSynchronizedPart;
 import org.eclipse.emf.henshin.variability.configuration.ui.parts.LinkWithEditorSelectionListener;
 import org.eclipse.emf.henshin.variability.configuration.ui.parts.SynchronizedTableViewer;
-import org.eclipse.emf.henshin.variability.configuration.ui.policies.NodeCompartmentItemVariabilityEditPolicy;
-import org.eclipse.emf.henshin.variability.configuration.ui.policies.RuleCompartmenItemVariabilityEditPolicy;
+import org.eclipse.emf.henshin.variability.configuration.ui.policies.NodeVariabilityEditPolicy;
+import org.eclipse.emf.henshin.variability.configuration.ui.policies.RuleVariabilityEditPolicy;
 import org.eclipse.emf.henshin.variability.configuration.ui.providers.ConfigurationProvider;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerBindingEditingSupport;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerComparator;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerContentProvider;
 import org.eclipse.emf.henshin.variability.ui.viewer.util.VPViewerNameEditingSupport;
+import org.eclipse.emf.transaction.ResourceSetChangeEvent;
+import org.eclipse.emf.transaction.ResourceSetListenerImpl;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.editparts.AbstractEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
@@ -53,6 +62,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -72,6 +82,7 @@ import org.eclipse.ui.part.ViewPart;
 import configuration.Configuration;
 import configuration.Favorite;
 import configuration.VariabilityPoint;
+import configuration.impl.ConfigurationImpl;
 import swing2swt.layout.FlowLayout;
 
 public class VariabilityView extends ViewPart
@@ -98,7 +109,7 @@ public class VariabilityView extends ViewPart
 	private RuleEditPart selectedRuleEditPart;
 
 	private Label ruleNameLabel;
-
+	
 	public RuleEditPart getSelectedRuleEditPart() {
 		return selectedRuleEditPart;
 	}
@@ -127,7 +138,29 @@ public class VariabilityView extends ViewPart
 		
 		Button add = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
 		add.setImage(ImageHelper.getImage("/icons/add.gif"));
-		
+		add.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				NameDialog dialog = new NameDialog(getViewSite().getShell(), "Variability Point");
+				
+				if(dialog.open() == Window.OK) {
+					Rule rule = VariabilityModelHelper.getRuleForEditPart(selectedRuleEditPart);
+					
+					EditingDomain domain = TransactionUtil.getEditingDomain(rule);
+					Command cmd = AddCommand.create(domain, rule, HenshinPackage.Literals.RULE__VARIABILITY_POINTS, dialog.getName());
+					domain.getCommandStack().execute(cmd);
+					viewer.refresh();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+				
 		Button delete = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
 		delete.setImage(ImageHelper.getImage("/icons/delete.gif"));
 		Composite tableComposite = new Composite(parent, SWT.NONE);
@@ -189,7 +222,8 @@ public class VariabilityView extends ViewPart
 			}
 			@Override
 			public Image getImage(Object element) {
-				return ImageHelper.getImage("/icons/" +  ((VariabilityPoint) element).getBinding().getName().toLowerCase() +  ".png");
+				return ImageHelper.getImage("/icons/table_default.png");
+				//return ImageHelper.getImage("/icons/" +  ((VariabilityPoint) element).getBinding().getName().toLowerCase() +  ".png");
 			}
 		});
 		col.setEditingSupport(new VPViewerBindingEditingSupport(viewer));
@@ -236,7 +270,6 @@ public class VariabilityView extends ViewPart
 
 		Label separator = new Label(parent, SWT.HORIZONTAL | SWT.SEPARATOR);
 		separator.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-
 		
 		GridData tableCompositeGridData = new GridData();
 		tableCompositeGridData.grabExcessHorizontalSpace = true;
@@ -283,13 +316,13 @@ public class VariabilityView extends ViewPart
 	}
 
 	private void installConfigurationEditPolicy(AbstractEditPart editPart) {
-		editPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new RuleCompartmenItemVariabilityEditPolicy(config));
+		editPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new RuleVariabilityEditPolicy(config));
 		
 		for(Object child : editPart.getChildren()) {
 			if(child instanceof NodeEditPart) {
 				NodeEditPart nodeEditPart = (NodeEditPart) child;
 				NodeCompartmentEditPart nodeCompartmentEditPart = (NodeCompartmentEditPart) nodeEditPart.getChildren().get(2);
-				nodeCompartmentEditPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new NodeCompartmentItemVariabilityEditPolicy(config));
+				nodeCompartmentEditPart.installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE, new NodeVariabilityEditPolicy(config));
 			}
 		}
 	}
@@ -398,8 +431,8 @@ public class VariabilityView extends ViewPart
 				// Star button was clicked
 				if (event.detail == 0) {
 					if (!configurationProvider.isFavorite(config)) {
-						FavoriteConfigurationNameDialog dialog = new FavoriteConfigurationNameDialog(
-								getViewSite().getShell());
+						NameDialog dialog = new NameDialog(
+								getViewSite().getShell(), "Favorite Configuration");
 						if (dialog.open() == Window.OK) {
 							String name = dialog.getName();
 							Favorite favorite = configurationProvider.addConfigurationToFavorites(config.getRule(),
@@ -472,9 +505,27 @@ public class VariabilityView extends ViewPart
 		viewer.getControl().setFocus();
 	}
 
+	
+	private class ConfigurationListener extends ResourceSetListenerImpl {
+		
+		@Override
+		public void resourceSetChanged(ResourceSetChangeEvent event) {
+			 super.resourceSetChanged(event);
+			 for(Notification notification : event.getNotifications()) {
+				 if(notification instanceof ENotificationImpl && notification.getEventType() == Notification.ADD 
+						 && notification.getNotifier().getClass() == ConfigurationImpl.class && notification.getFeatureID(ConfigurationImpl.class) == 15) {
+					 viewer.refresh();
+				 }
+			 }
+		}
+	}
+	
 	@Override
 	public void setContent(Configuration config) {
 		Rule rule = config.getRule();
+
+		TransactionalEditingDomain domain = TransactionUtil.getEditingDomain(rule);
+		domain.addResourceSetListener(new ConfigurationListener());
 
 		viewer.setInput(config);
 		ruleNameLabel.setText("Rule " + rule.getName());

@@ -23,7 +23,7 @@ public class ConfigurationProvider {
 	private Map<Rule, Configuration> currentConfigurations = new HashMap<Rule, Configuration>();
 	private Map<Rule, Set<Favorite>> favoriteConfigurations = new HashMap<Rule, Set<Favorite>>();
 	private static ConfigurationProvider vpProvider = new ConfigurationProvider();
-	ConfigurationFactory fac = ConfigurationFactoryImpl.init();
+	ConfigurationFactory fac = ConfigurationFactory.eINSTANCE;
 
 	public static ConfigurationProvider getInstance() {
 		return vpProvider;

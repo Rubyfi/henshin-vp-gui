@@ -45,7 +45,19 @@
                label="&amp;Find Presence Conditions"
                >
          </action>
-     </objectContribution>       
+     </objectContribution>
+
+          <objectContribution
+            id="org.eclipse.emf.henshin.variability.ui.objectContribution.ModuleEditPart2"
+            objectClass="org.eclipse.gef.editparts.AbstractEditPart"> 
+
+            <action
+               class="org.eclipse.emf.henshin.variability.configuration.ui.actions.MoveElementToConfigurationAction"
+               enablesFor="+"
+               id="org.eclipse.emf.henshin.variability.ui.popup.MoveElementToConfigurationActionID"
+               label="&amp;Move to active configuration">
+         </action>
+     </objectContribution>
 </extension>
   <extension
         point="org.eclipse.ui.menus">

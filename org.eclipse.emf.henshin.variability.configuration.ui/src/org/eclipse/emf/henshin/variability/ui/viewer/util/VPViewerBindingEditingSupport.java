@@ -34,8 +34,14 @@ public class VPViewerBindingEditingSupport extends EditingSupport {
 
 	@Override
 	protected void setValue(Object element, Object value) {
-		((VariabilityPoint)element).setBinding(VariabilityPointBinding.get((int)value));
-		getViewer().update(element, null);
+		VariabilityPoint vp = (VariabilityPoint)element;
+		VariabilityPointBinding oldBinding = vp.getBinding();
+		VariabilityPointBinding newBinding = VariabilityPointBinding.get((int)value);
+		
+		if(oldBinding != newBinding) {
+			vp.setBinding(newBinding);
+			getViewer().update(element, new String[]{"binding"});
+		}
 	}
 
 }

@@ -23,11 +23,11 @@ import org.eclipse.swt.widgets.Shell;
 
 import configuration.Configuration;
 
-public class VariabilityBasedAttributeCreateCommand extends AttributeCreateCommand {
+public class VariabilityAttributeCreateCommand extends AttributeCreateCommand {
 	
 	private final Configuration configuration;
 
-	public VariabilityBasedAttributeCreateCommand(CreateElementRequest req, Shell shell, Configuration configuration) {
+	public VariabilityAttributeCreateCommand(CreateElementRequest req, Shell shell, Configuration configuration) {
 		super(req, shell);
 		this.configuration = configuration;
 	}

@@ -1,1 +1,4 @@
 /org.eclipse.emf.henshin.variability.bin/
+/.classpath
+/.gitignore
+/.DS_Store

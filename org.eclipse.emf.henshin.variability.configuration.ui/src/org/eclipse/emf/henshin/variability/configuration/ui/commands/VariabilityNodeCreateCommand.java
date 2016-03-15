@@ -19,11 +19,11 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.CreateElementRequest;
 
 import configuration.Configuration;
 
-public class VariabilityBasedNodeCreateCommand extends NodeCreateCommand {
+public class VariabilityNodeCreateCommand extends NodeCreateCommand {
 
 	private final Configuration configuration;
 	
-	public VariabilityBasedNodeCreateCommand(CreateElementRequest req, Configuration configuration) {
+	public VariabilityNodeCreateCommand(CreateElementRequest req, Configuration configuration) {
 		super(req);
 		this.configuration = configuration;
 	}

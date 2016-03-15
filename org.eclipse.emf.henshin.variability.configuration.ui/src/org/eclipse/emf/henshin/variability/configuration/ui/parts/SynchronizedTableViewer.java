@@ -15,6 +15,8 @@ public class SynchronizedTableViewer extends TableViewer {
 	@Override
 	public void update(Object element, String[] properties) {
 		super.update(element, properties);
-		synchronizedPart.tableViewerUpdated();
+		if(synchronizedPart != null) {
+			synchronizedPart.tableViewerUpdated();
+		}
 	}
 }

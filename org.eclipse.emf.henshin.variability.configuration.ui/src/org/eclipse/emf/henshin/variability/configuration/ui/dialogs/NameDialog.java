@@ -13,13 +13,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class FavoriteConfigurationNameDialog extends Dialog {
+public class NameDialog extends Dialog {
 
 	private String name = "";
 	private Text txtName;
-
-	public FavoriteConfigurationNameDialog(Shell parentShell) {
+	private String title;
+	
+	public NameDialog(Shell parentShell, String title) {
 		super(parentShell);
+		this.title = title;
 	}
 
 	@Override
@@ -57,7 +59,7 @@ public class FavoriteConfigurationNameDialog extends Dialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Favorite Configuration");
+		newShell.setText(this.title);
 	}
 	
 	@Override
