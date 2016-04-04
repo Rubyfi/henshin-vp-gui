@@ -1,7 +1,14 @@
 package org.eclipse.emf.henshin.variability.ui;
 
+import java.io.IOException;
+import java.util.PropertyResourceBundle;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import scala.reflect.generic.Trees.This;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -13,6 +20,8 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
+	
+	private static PropertyResourceBundle properties;
 	
 	/**
 	 * The constructor
@@ -47,6 +56,19 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
+	}
+	
+	public static PropertyResourceBundle getProperties() {
+		if(properties == null) {
+			try {
+				properties = new PropertyResourceBundle(
+						FileLocator.openStream(plugin.getBundle(), new Path("plugin.properties"), false));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return properties;
 	}
 
 }

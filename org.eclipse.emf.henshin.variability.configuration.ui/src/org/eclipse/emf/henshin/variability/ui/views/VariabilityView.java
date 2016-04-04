@@ -1,5 +1,7 @@
 package org.eclipse.emf.henshin.variability.ui.views;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.core.databinding.DataBindingContext;
@@ -10,6 +12,7 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.databinding.EMFProperties;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.henshin.diagram.edit.parts.NodeCompartmentEditPart;
 import org.eclipse.emf.henshin.diagram.edit.parts.RuleEditPart;
@@ -52,6 +55,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -110,6 +114,8 @@ public class VariabilityView extends ViewPart
 
 	private Label ruleNameLabel;
 	
+	private Button add, delete;
+	
 	public RuleEditPart getSelectedRuleEditPart() {
 		return selectedRuleEditPart;
 	}
@@ -136,17 +142,17 @@ public class VariabilityView extends ViewPart
 		buttonComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 1, 1));
 		buttonComposite.setLayout(new FlowLayout(FlowLayout.RIGHT, 0, 5));
 		
-		Button add = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
+		add = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
 		add.setImage(ImageHelper.getImage("/icons/add.gif"));
 		add.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				NameDialog dialog = new NameDialog(getViewSite().getShell(), "Variability Point");
+				Rule rule = VariabilityModelHelper.getRuleForEditPart(selectedRuleEditPart);
+				
+				NameDialog dialog = new NameDialog(getViewSite().getShell(), "VariabilityPoint", rule.getVariabilityPoints());
 				
 				if(dialog.open() == Window.OK) {
-					Rule rule = VariabilityModelHelper.getRuleForEditPart(selectedRuleEditPart);
-					
 					EditingDomain domain = TransactionUtil.getEditingDomain(rule);
 					Command cmd = AddCommand.create(domain, rule, HenshinPackage.Literals.RULE__VARIABILITY_POINTS, dialog.getName());
 					domain.getCommandStack().execute(cmd);
@@ -160,9 +166,46 @@ public class VariabilityView extends ViewPart
 				
 			}
 		});
-				
-		Button delete = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
+		add.setEnabled(false);	
+		
+		delete = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
 		delete.setImage(ImageHelper.getImage("/icons/delete.gif"));
+		delete.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Rule rule = VariabilityModelHelper.getRuleForEditPart(selectedRuleEditPart);
+				StructuredSelection selection = (StructuredSelection) viewer.getSelection();
+				ArrayList<String> selectedVariabilityPoints = new ArrayList<String>();
+				Iterator<?> it = selection.iterator();
+				
+				while(it.hasNext()) {
+					Object obj = it.next();
+					
+					if(obj instanceof VariabilityPoint) {
+						selectedVariabilityPoints.add(((VariabilityPoint)obj).getName());
+					}
+				}
+				
+				MessageDialog messageDialog = new MessageDialog(getViewSite().getShell(), "Delete Variability Points", null, 
+						"Do you really want to delete the selected variability points?\nDoing so may render the rule's feature model invalid.", MessageDialog.WARNING, new String[]{"No", "Yes"}, 0);
+
+				if(messageDialog.open() == 1) {
+					EditingDomain domain = TransactionUtil.getEditingDomain(rule);
+					Command cmd = RemoveCommand.create(domain, rule, HenshinPackage.Literals.RULE__VARIABILITY_POINTS, selectedVariabilityPoints);
+					domain.getCommandStack().execute(cmd);
+					viewer.refresh();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		delete.setEnabled(false);
+		
 		Composite tableComposite = new Composite(parent, SWT.NONE);
 		tableComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 		TableColumnLayout tableColumnLayout = new TableColumnLayout();
@@ -260,7 +303,7 @@ public class VariabilityView extends ViewPart
 		Label variabilityModelLabel = new Label(composite, SWT.NONE);
 		variabilityModelLabel.setImage(ImageHelper.getImage("/icons/variability.gif"));
 		variabilityModelText = new Text(composite, SWT.BORDER | SWT.SEARCH);
-		variabilityModelText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		variabilityModelText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		IObservableValue target = WidgetProperties.text(SWT.Modify).observe(variabilityModelText);
 		DataBindingContext bindingContext = new DataBindingContext();
 		writableValue = new WritableValue();
@@ -431,12 +474,20 @@ public class VariabilityView extends ViewPart
 				// Star button was clicked
 				if (event.detail == 0) {
 					if (!configurationProvider.isFavorite(config)) {
+						Rule rule = VariabilityModelHelper.getRuleForEditPart(selectedRuleEditPart);
+						ArrayList<String> favoriteNames = new ArrayList<String>();
+						Set<Favorite> favorites = configurationProvider.getFavorites(rule);
+
+						if(favorites != null) {
+							for(Favorite fav : favorites) {
+								favoriteNames.add(fav.getName());
+							}
+						}
 						NameDialog dialog = new NameDialog(
-								getViewSite().getShell(), "Favorite Configuration");
+								getViewSite().getShell(), "Favorite", favoriteNames);
 						if (dialog.open() == Window.OK) {
 							String name = dialog.getName();
-							Favorite favorite = configurationProvider.addConfigurationToFavorites(config.getRule(),
-									name, config);
+							Favorite favorite = configurationProvider.addConfigurationToFavorites(rule, name, config);
 							LoadFavoriteConfigurationAction loadConfigurationAction = new LoadFavoriteConfigurationAction(
 									favorite, VariabilityView.this);
 							this.addActionToMenu(loadConfigurationAction);
@@ -531,6 +582,9 @@ public class VariabilityView extends ViewPart
 		ruleNameLabel.setText("Rule " + rule.getName());
 		loadFavoritesMenu.setChecked(configurationProvider.isFavorite(config));
 		writableValue.setValue(rule);
+		
+		add.setEnabled(true);
+		delete.setEnabled(true);
 	}
 
 	@Override

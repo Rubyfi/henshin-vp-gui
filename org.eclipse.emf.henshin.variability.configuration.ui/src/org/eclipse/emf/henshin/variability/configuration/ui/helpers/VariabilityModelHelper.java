@@ -15,7 +15,13 @@ import de.fosd.typechef.featureexpr.FeatureExpr;
 public class VariabilityModelHelper {
 	
 	public static Rule getRuleForEditPart(RuleEditPart ruleEditPart) {
-		return (Rule)((ShapeImpl)ruleEditPart.getModel()).getElement();
+		Rule result = null;
+		
+		if(ruleEditPart != null) {
+			result = (Rule)((ShapeImpl)ruleEditPart.getModel()).getElement();
+		}
+		
+		return result;
 	}
 	
 	public static FeatureExpr getFeatureExpression(Configuration configuration) {
@@ -29,7 +35,6 @@ public class VariabilityModelHelper {
 		}
 		return expr;
 	}
-	
 	
 	public static String getPresenceCondition(Configuration configuration) {
 		StringBuilder result = new StringBuilder();
@@ -50,20 +55,36 @@ public class VariabilityModelHelper {
 		return result.toString();
 	}
 	
+	private static FeatureExpr getFeatureExpression(Configuration configuration, VariabilityPoint variabilityPoint) {
+		FeatureExpr expr = FeatureExpression.getExpr(configuration.getRule().getFeatureModel());
+		for(VariabilityPoint vp : configuration.getVariabilityPoints()) {
+			if(vp.getName() != variabilityPoint.getName() && vp.getBinding() == VariabilityPointBinding.TRUE) {
+				expr = FeatureExpression.and(expr, FeatureExpression.getExpr("def(" + vp.getName() + ")"));
+			} else if (vp.getName() != variabilityPoint.getName() && vp.getBinding() == VariabilityPointBinding.FALSE) {
+				expr = FeatureExpression.andNot(expr, FeatureExpression.getExpr("def(" + vp.getName() + ")"));
+			}
+		}
+		return expr;
+	}
 	
 	public static String[] getNonContradictingBindingOptions(Configuration configuration, VariabilityPoint vp) {
 		ArrayList<String> options = new ArrayList<String>();
-		FeatureExpr expr = getFeatureExpression(configuration);
+		FeatureExpr configurationExpr = getFeatureExpression(configuration, vp);
 		
 		options.add(VariabilityPointBinding.UNBOUND.getName());
-		if(!FeatureExpression.contradicts(expr, FeatureExpression.getExpr("def(" + vp + ")"))) {
+		if(!FeatureExpression.contradicts(configurationExpr, FeatureExpression.getExpr("def(" + vp.getName() + ")"))) {
 			options.add(VariabilityPointBinding.TRUE.getName());
 		}
 		
-		if(!FeatureExpression.contradicts(expr, FeatureExpression.getExpr("!(def(" + vp + "))"))) {
+		if(!FeatureExpression.contradicts(configurationExpr, FeatureExpression.getExpr("!(def(" + vp.getName() + "))"))) {
 			options.add(VariabilityPointBinding.FALSE.getName());
 		}
 		
-		return (String[]) options.toArray();
+		String[] result = new String[options.size()];
+		for(int i=result.length-1; i >=0; i--) {
+			result[i] = options.get(i);
+		}
+		
+		return result;
 	}
 }
