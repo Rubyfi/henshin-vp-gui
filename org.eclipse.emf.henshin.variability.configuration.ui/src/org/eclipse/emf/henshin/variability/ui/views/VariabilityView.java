@@ -86,6 +86,7 @@ import org.eclipse.ui.part.ViewPart;
 import configuration.Configuration;
 import configuration.Favorite;
 import configuration.VariabilityPoint;
+import configuration.VariabilityPointBinding;
 import configuration.impl.ConfigurationImpl;
 import swing2swt.layout.FlowLayout;
 
@@ -114,7 +115,7 @@ public class VariabilityView extends ViewPart
 
 	private Label ruleNameLabel;
 	
-	private Button add, delete;
+	private Button add, delete, clear;
 	
 	public RuleEditPart getSelectedRuleEditPart() {
 		return selectedRuleEditPart;
@@ -205,6 +206,30 @@ public class VariabilityView extends ViewPart
 			}
 		});
 		delete.setEnabled(false);
+		
+		clear = new Button(buttonComposite, SWT.BORDER | SWT.FLAT);
+		clear.setImage(ImageHelper.getImage("/icons/clear.gif"));
+		clear.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(config != null) {
+					for(VariabilityPoint vp : config.getVariabilityPoints()) {
+						vp.setBinding(VariabilityPointBinding.UNBOUND);
+					}
+					viewer.update(viewer.getInput(), new String[]{"variabilityPoints"});
+					viewer.refresh();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		clear.setEnabled(false);
 		
 		Composite tableComposite = new Composite(parent, SWT.NONE);
 		tableComposite.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
@@ -585,6 +610,7 @@ public class VariabilityView extends ViewPart
 		
 		add.setEnabled(true);
 		delete.setEnabled(true);
+		clear.setEnabled(true);
 	}
 
 	@Override
